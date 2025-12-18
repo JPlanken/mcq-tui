@@ -6,7 +6,6 @@ Main entry point for the CLI application.
 
 import sys
 from pathlib import Path
-from rich.console import Console
 from rich.prompt import Prompt, Confirm
 from rich.markdown import Markdown
 
@@ -17,13 +16,13 @@ from src import (
     show_result,
     get_user_answer,
 )
+from src.console import console
+from src.constants import NavCommand
 
 
 def main():
     """Main application loop"""
     import argparse
-    
-    console = Console()
     
     parser = argparse.ArgumentParser(
         description="Multiple Choice Question TUI - Interactive terminal UI for answering questions from YAML files",
@@ -52,7 +51,6 @@ Example:
     
     console.print("[bold cyan]Multiple Choice Question TUI[/bold cyan]\n")
     
-    # Get file path
     if args.file:
         file_path = Path(args.file)
     else:
@@ -63,7 +61,6 @@ Example:
         console.print(f"[red]Error: File not found: {file_path}[/red]")
         return
     
-    # Parse questions
     console.print(f"\n[dim]Parsing YAML questions from {file_path}...[/dim]")
     questions = parse_yaml_questions(file_path)
     
@@ -85,34 +82,29 @@ questions:
     
     console.print(f"[green]Found {len(questions)} question(s)[/green]\n")
     
-    # Main navigation loop
-    current_idx = 0  # 0-based index
+    current_idx = 0
     total = len(questions)
     
     try:
         while True:
-            # Display current question
             display_question(questions[current_idx], current_idx + 1, total)
             
-            # Get user input (answer or navigation)
             try:
                 answer_data, nav_command = get_user_answer(questions[current_idx], current_idx + 1, total)
             except KeyboardInterrupt:
                 console.print("\n\n[yellow]Interrupted by user (Ctrl+C)[/yellow]")
                 raise
             
-            # Handle navigation commands
-            if nav_command == 'q':
+            if nav_command == NavCommand.QUIT:
                 if Confirm.ask("\n[yellow]Quit quiz?[/yellow]", default=True):
                     break
                 continue
-            elif nav_command == 's':
+            elif nav_command == NavCommand.SUMMARY:
                 show_summary(questions)
                 if not Confirm.ask("\n[dim]Return to questions?[/dim]", default=True):
                     break
                 continue
-            elif nav_command == 'j':
-                # Jump to specific question
+            elif nav_command == NavCommand.JUMP:
                 try:
                     target = Prompt.ask(f"Jump to question (1-{total})", default=str(current_idx + 1))
                     target_num = int(target)
@@ -125,36 +117,28 @@ questions:
                     console.print("[red]Invalid input[/red]")
                     input("\nPress Enter to continue...")
                 continue
-            elif nav_command == 'p':
-                # Previous question
+            elif nav_command == NavCommand.PREVIOUS:
                 if current_idx > 0:
                     current_idx -= 1
                 continue
-            elif nav_command == 'n':
-                # Next question
+            elif nav_command == NavCommand.NEXT:
                 if current_idx < total - 1:
                     current_idx += 1
                 else:
-                    # Reached end, show summary
                     show_summary(questions)
                     break
                 continue
             
-            # Handle answer input
-            # Note: Input handlers already set question attributes, so we just need to show result
             if answer_data is not None:
                 question = questions[current_idx]
                 show_result(question)
                 
-                # Auto-advance to next question after answering
                 if current_idx < total - 1:
                     current_idx += 1
                 else:
-                    # Last question answered, show summary
                     show_summary(questions)
                     break
             elif nav_command is None:
-                # Empty input or invalid - treat as next
                 if current_idx < total - 1:
                     current_idx += 1
                 else:

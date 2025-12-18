@@ -177,6 +177,65 @@ questions:
             self.assertIn("single", types)
             self.assertIn("multi", types)
             self.assertIn("yesno", types)
+    
+    def test_parse_invalid_yaml(self):
+        """Test parsing invalid YAML"""
+        yaml_content = "invalid: yaml: content: ["
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as f:
+            f.write(yaml_content)
+            temp_path = f.name
+        
+        try:
+            questions = parse_yaml_questions(Path(temp_path))
+            # Should return empty list on error, not crash
+            self.assertEqual(len(questions), 0)
+        finally:
+            os.unlink(temp_path)
+    
+    def test_parse_missing_file(self):
+        """Test parsing non-existent file"""
+        fake_path = Path("/nonexistent/path/questions.yaml")
+        questions = parse_yaml_questions(fake_path)
+        # Should return empty list on error, not crash
+        self.assertEqual(len(questions), 0)
+    
+    def test_parse_question_without_text(self):
+        """Test parsing question without text"""
+        yaml_content = """
+questions:
+  - type: single
+    options:
+      - "A"
+      - "B"
+"""
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as f:
+            f.write(yaml_content)
+            temp_path = f.name
+        
+        try:
+            questions = parse_yaml_questions(Path(temp_path))
+            # Questions without text should be skipped
+            self.assertEqual(len(questions), 0)
+        finally:
+            os.unlink(temp_path)
+    
+    def test_parse_single_without_options(self):
+        """Test parsing single-select without options"""
+        yaml_content = """
+questions:
+  - question: "Test?"
+    type: single
+"""
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as f:
+            f.write(yaml_content)
+            temp_path = f.name
+        
+        try:
+            questions = parse_yaml_questions(Path(temp_path))
+            # Single-select without options should be skipped
+            self.assertEqual(len(questions), 0)
+        finally:
+            os.unlink(temp_path)
 
 
 class TestDisplayFunctions(unittest.TestCase):
@@ -212,41 +271,6 @@ class TestDisplayFunctions(unittest.TestCase):
             show_summary(questions)
         except Exception as e:
             self.fail(f"show_summary raised {e}")
-
-
-class TestAnswerProcessing(unittest.TestCase):
-    """Test answer processing logic"""
-    
-    def test_single_select_answer_processing(self):
-        """Test processing single-select answers"""
-        q = Question("Test?", ["A", "B"], "single")
-        
-        # Simulate answer processing from main loop
-        answer_data = "2"
-        q.user_answer = int(answer_data)
-        self.assertEqual(q.user_answer, 2)
-        self.assertTrue(q.is_answered())
-    
-    def test_multi_select_answer_processing(self):
-        """Test processing multi-select answers"""
-        q = Question("Test?", ["A", "B", "C"], "multi")
-        
-        # Simulate answer processing from main loop
-        answer_data = "1,3"
-        selected = [int(n.strip()) for n in answer_data.split(',') if n.strip()]
-        q.user_answers = selected
-        self.assertEqual(q.user_answers, [1, 3])
-        self.assertTrue(q.is_answered())
-    
-    def test_yesno_answer_processing(self):
-        """Test processing yes/no answers"""
-        q = Question("Test?", ["Yes", "No"], "yesno")
-        
-        # Simulate answer processing
-        answer_data = "1"
-        q.user_answer = 1
-        self.assertEqual(q.user_answer, 1)
-        self.assertTrue(q.is_answered())
 
 
 def run_integration_test():

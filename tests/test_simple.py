@@ -142,6 +142,41 @@ def test_file_structure():
     
     return all_exist
 
+def test_utilities():
+    """Test utility functions"""
+    print("\nTesting utilities...")
+    try:
+        import subprocess
+        result = subprocess.run(
+            [sys.executable, str(Path(__file__).parent / "test_utilities.py")],
+            capture_output=True,
+            timeout=10,
+            text=True
+        )
+        if result.returncode == 0:
+            # unittest outputs to stderr, check both stdout and stderr
+            import re
+            output = result.stdout + result.stderr
+            match = re.search(r'Ran (\d+) tests', output)
+            if match:
+                total = int(match.group(1))
+                # Check if all passed (look for "OK" anywhere in output)
+                if "OK" in output:
+                    print(f"✓ {total} utility tests passed")
+                    return True
+                else:
+                    print(f"✗ Some utility tests failed")
+                    return False
+            # Fallback: just check return code
+            print("✓ Utility tests completed")
+            return True
+        else:
+            print(f"✗ Utility tests failed: {result.stderr[:200]}")
+            return False
+    except Exception as e:
+        print(f"✗ Utility test execution failed: {e}")
+        return False
+
 def main():
     """Run all simple tests"""
     print("="*60)
@@ -154,6 +189,7 @@ def main():
         ("Question Class", test_question_class),
         ("YAML Parsing", test_yaml_parsing),
         ("CLI Invocation", test_cli_exists),
+        ("Utilities", test_utilities),
     ]
     
     results = []

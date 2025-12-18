@@ -4,17 +4,16 @@ YAML parsing functionality
 
 from pathlib import Path
 from typing import List
-from rich.console import Console
 
 from .question import Question
+from .console import console
+from .constants import QuestionType
 
 try:
     import yaml
     YAML_AVAILABLE = True
 except ImportError:
     YAML_AVAILABLE = False
-
-console = Console()
 
 
 def parse_yaml_questions(file_path: Path) -> List[Question]:
@@ -31,16 +30,14 @@ def parse_yaml_questions(file_path: Path) -> List[Question]:
         if 'questions' in data:
             for q_data in data['questions']:
                 question_text = q_data.get('question', '').strip()
-                question_type = q_data.get('type', 'single').lower()
+                question_type = q_data.get('type', QuestionType.SINGLE).lower()
                 options = q_data.get('options', [])
                 
-                # For yesno type, create default options if not provided
-                if question_type == 'yesno' and not options:
+                if question_type == QuestionType.YESNO and not options:
                     options = ['Yes', 'No']
                 
                 if question_text:
-                    # For yesno type, options are optional
-                    if question_type == 'yesno' or options:
+                    if question_type == QuestionType.YESNO or options:
                         questions.append(Question(question_text, options, question_type))
         
         return questions

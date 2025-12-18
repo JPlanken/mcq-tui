@@ -14,7 +14,7 @@ This will test:
 - Question class functionality
 - YAML parsing
 - Display functions
-- Answer processing logic
+- Utility functions (navigation, answer formatting)
 
 ## Interactive Testing
 
@@ -62,7 +62,9 @@ This will automatically:
 
 ## Test Files
 
-- `test_mcq_tui.py` - Unit tests (no special dependencies)
+- `test_simple.py` - Quick validation tests (no special dependencies)
+- `test_mcq_tui.py` - Comprehensive unit tests (no special dependencies)
+- `test_utilities.py` - Utility function tests (no special dependencies)
 - `test_interactive.py` - Integration tests (requires pexpect)
 
 ## What Gets Tested
@@ -103,11 +105,11 @@ When tests pass, you should see:
 ```
 Running Unit Tests
 ============================================================
-test_multi_select_answer_processing ... ok
-test_single_select_answer_processing ... ok
+test_single_select_question ... ok
+test_multi_select_question ... ok
 ...
 ----------------------------------------------------------------------
-Ran 15 tests in 0.009s
+Ran 12 tests in 0.009s
 
 OK
 ```
