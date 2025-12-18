@@ -37,7 +37,8 @@ Test scenarios:
    - Press `s` to show summary
    - Press `q` to quit
 5. **Other option**: Press `0` in single-select questions to enter free text
-6. **Ctrl+C**: Should quit cleanly at any time
+6. **Answer storage**: After completing questions, verify answers are saved to YAML file
+7. **Ctrl+C**: Should quit cleanly at any time (saves partial results with confirmation)
 
 ### Automated Interactive Testing
 
@@ -72,9 +73,11 @@ This will automatically:
 ### Unit Tests (`test_mcq_tui.py`)
 
 ✅ Question class creation and answering  
-✅ YAML parsing (all question types)  
+✅ YAML parsing (all question types, including question IDs)  
 ✅ Default question type handling  
 ✅ Answer processing logic  
+✅ Answer storage and serialization (`get_answer_dict()`)  
+✅ Answer export to YAML  
 ✅ Display functions (non-crashing)  
 ✅ Summary generation  
 

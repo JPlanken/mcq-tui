@@ -2,6 +2,19 @@
 
 A Rich-based terminal user interface for answering multiple choice questions from YAML files with interactive visual feedback.
 
+## Quick Start
+
+```bash
+# Install
+cd mcq-tui
+uv pip install -e .
+
+# Run
+mcq example_questions.yaml
+```
+
+See [INSTALL.md](INSTALL.md) for detailed installation instructions and troubleshooting.
+
 ## Installation
 
 ### Install as CLI Tool
@@ -52,7 +65,7 @@ The TUI supports three question types:
 
 ### 1. Single-Select (`type: single` or default)
 - Choose one option from a list
-- Press number key (1-N) to select
+- Press number key (1-N) to select, then Enter to confirm
 - Option 0 for "Other" (free text input)
 
 ### 2. Multi-Select (`type: multi`)
@@ -65,6 +78,7 @@ The TUI supports three question types:
 - Simple Yes/No/Other questions
 - Press `1` (Yes), `2` (No), or `3` (Other)
 - Also accepts `y`, `n`, `o` for compatibility
+- Press Enter to confirm
 
 ## YAML Format
 
@@ -77,7 +91,8 @@ author: "John Doe"
 
 questions:
   # Single-select (default)
-  - question: "What is the capital of France?"
+  - id: 1
+    question: "What is the capital of France?"
     type: single
     options:
       - "London"
@@ -86,7 +101,8 @@ questions:
       - "Madrid"
   
   # Multi-select
-  - question: "Which programming languages do you know? (Select all that apply)"
+  - id: 2
+    question: "Which programming languages do you know? (Select all that apply)"
     type: multi
     options:
       - "Python"
@@ -95,19 +111,48 @@ questions:
       - "Go"
   
   # Yes/No
-  - question: "Do you prefer Python over JavaScript?"
+  - id: 3
+    question: "Do you prefer Python over JavaScript?"
     type: yesno
+```
+
+After answering questions, the YAML file will be updated with answers:
+
+```yaml
+questions:
+  - id: 1
+    question: "What is the capital of France?"
+    type: single
+    options:
+      - "London"
+      - "Paris"
+      - "Berlin"
+      - "Madrid"
+    answer:
+      index: 2
+      option: "Paris"
+metadata:
+  last_answered: "2025-12-18T10:36:27.096193"
+  answered_count: 1
+  total_questions: 3
 ```
 
 **Format Rules:**
 - Root level: `title`, `description`, `author` (all optional)
 - `questions` array contains question objects
 - Each question has:
+  - `id` (optional): Unique identifier for the question (string or number)
   - `question` (required): The question text
   - `type` (optional): `single`, `multi`, or `yesno` (defaults to `single`)
   - `options` (required for `single` and `multi`, optional for `yesno`): Array of option strings
 - Options are displayed as numbered choices (1, 2, 3...)
 - Option 0 is always "Other" for single-select questions
+
+**Answer Storage:**
+- Answers are automatically saved back to the YAML file when you finish or exit
+- Each answered question gets an `answer` field with the selected response
+- A `metadata` section is added with timestamp and statistics
+- Answers persist in the same file, making it easy to share results with agents or review later
 
 ## Features
 
@@ -118,7 +163,9 @@ questions:
 - ✅ **Keyboard Shortcuts**: `j` (jump), `s` (summary), `q` (quit)
 - ✅ **Progress Tracking**: Shows current question number and answer status
 - ✅ **Final Summary**: Review all answers at the end
-- ✅ **Ctrl+C Support**: Quit anytime with Ctrl+C
+- ✅ **Automatic Answer Storage**: Answers are automatically saved back to the YAML file
+- ✅ **Question IDs**: Support for question IDs to track answers across sessions
+- ✅ **Ctrl+C Support**: Quit anytime with Ctrl+C (saves partial results)
 - ✅ **Beautiful Rich-based Terminal UI**: Colorful, formatted display
 - ✅ **YAML Format Support**: Easy-to-edit question files
 
@@ -142,28 +189,34 @@ questions:
 - **Question type**: Shown in panel subtitle
 - **Answer status**: Shown in header (✓ Answered / ○ Not answered)
 
-
 ## Project Structure
 
 ```
 mcq-tui/
-├── src/                 # Main package
-│   ├── __init__.py      # Package exports
-│   ├── question.py      # Question data model
-│   ├── parser.py        # YAML parsing
-│   ├── display.py       # Display functions
-│   └── input_handlers.py # Input handling
-├── mcq_tui.py           # Main CLI entry point
-├── tests/               # Test suite
-│   ├── test_mcq_tui.py  # Unit tests
-│   ├── test_simple.py   # Simple validation tests
-│   ├── test_interactive.py # Interactive tests (requires pexpect)
-│   └── TESTING.md       # Testing documentation
-├── example_questions.yaml # Sample questions
-├── pyproject.toml       # Project configuration
-├── INSTALL.md           # Installation guide
-├── CONTEXT.md           # Technical details
-└── README.md            # This file
+├── src/                      # Main package
+│   ├── __init__.py           # Package exports
+│   ├── question.py           # Question data model
+│   ├── parser.py             # YAML parsing
+│   ├── display.py            # Display functions
+│   ├── input_handlers.py     # Input handling
+│   ├── export.py             # Answer export functionality
+│   ├── constants.py          # Constants and enums
+│   ├── console.py            # Shared console instance
+│   ├── terminal.py           # Terminal management utilities
+│   ├── navigation.py         # Navigation utilities
+│   └── answer_formatting.py  # Answer formatting utilities
+├── mcq_tui.py                # Main CLI entry point
+├── tests/                    # Test suite
+│   ├── test_mcq_tui.py      # Unit tests
+│   ├── test_simple.py        # Simple validation tests
+│   ├── test_utilities.py     # Utility function tests
+│   ├── test_interactive.py   # Interactive tests (requires pexpect)
+│   └── TESTING.md            # Testing documentation
+├── example_questions.yaml    # Sample questions
+├── pyproject.toml            # Project configuration
+├── INSTALL.md                # Installation guide
+├── CONTEXT.md                # Technical details
+└── README.md                 # This file
 ```
 
 ## Testing
@@ -177,6 +230,9 @@ python3 tests/test_simple.py
 # Unit tests
 python3 tests/test_mcq_tui.py
 
+# Utility tests
+python3 tests/test_utilities.py
+
 # Interactive tests (requires pexpect: pip install pexpect)
 python3 tests/test_interactive.py
 ```
@@ -188,6 +244,12 @@ See `tests/TESTING.md` for detailed testing documentation.
 - Python 3.8+
 - `rich` >= 13.0.0
 - `pyyaml` >= 6.0
+
+## Documentation
+
+- **[INSTALL.md](INSTALL.md)**: Detailed installation guide and troubleshooting
+- **[CONTEXT.md](CONTEXT.md)**: Technical implementation details and architecture
+- **[tests/TESTING.md](tests/TESTING.md)**: Testing documentation
 
 ## License
 

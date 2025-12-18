@@ -1,60 +1,74 @@
-title: "Sample Multiple Choice Questions"
-description: "A quiz covering various topics with different question types"
-author: "MCQ TUI"
-
+title: Sample Multiple Choice Questions
+description: A quiz covering various topics with different question types
+author: MCQ TUI
 questions:
-  # Single-select question (default type)
-  - id: 1
-    question: "What is the capital of France?"
-    type: single
-    options:
-      - "London"
-      - "Paris"
-      - "Berlin"
-      - "Madrid"
-  
-  # Multi-select question
-  - id: 2
-    question: "Which of the following are programming languages? (Select all that apply)"
-    type: multi
-    options:
-      - "Python"
-      - "HTML"
-      - "JavaScript"
-      - "CSS"
-      - "Java"
-      - "JSON"
-  
-  # Yes/No question
-  - id: 3
-    question: "Do you prefer working with Python over JavaScript?"
-    type: yesno
-  
-  # Yes/No question with custom options (optional)
-  - id: 4
-    question: "Is this application useful?"
-    type: yesno
-    options:
-      - "Definitely"
-      - "Not really"
-  
-  # Single-select with Other option
-  - id: 5
-    question: "What is your favorite programming language?"
-    type: single
-    options:
-      - "Python"
-      - "JavaScript"
-      - "Rust"
-      - "Go"
-  
-  # Multi-select with multiple answers
-  - id: 6
-    question: "Which databases have you used? (Select all that apply)"
-    type: multi
-    options:
-      - "PostgreSQL"
-      - "MySQL"
-      - "MongoDB"
-      - "Redis"
-      - "SQLite"
+- id: 1
+  question: What is the capital of France?
+  type: single
+  options:
+  - London
+  - Paris
+  - Berlin
+  - Madrid
+  answer:
+    index: 1
+    option: London
+- id: 2
+  question: Which of the following are programming languages? (Select all that apply)
+  type: multi
+  options:
+  - Python
+  - HTML
+  - JavaScript
+  - CSS
+  - Java
+  - JSON
+  answer:
+    selected_indices:
+    - 2
+    selected_options:
+    - HTML
+- id: 3
+  question: Do you prefer working with Python over JavaScript?
+  type: yesno
+  answer: 'No'
+- id: 4
+  question: Is this application useful?
+  type: yesno
+  options:
+  - Definitely
+  - Not really
+  answer: 'No'
+- id: 5
+  question: What is your favorite programming language?
+  type: single
+  options:
+  - Python
+  - JavaScript
+  - Rust
+  - Go
+  answer:
+    index: 3
+    option: Rust
+- id: 6
+  question: Which databases have you used? (Select all that apply)
+  type: multi
+  options:
+  - PostgreSQL
+  - MySQL
+  - MongoDB
+  - Redis
+  - SQLite
+  answer:
+    selected_indices:
+    - 1
+    - 2
+    - 3
+    selected_options:
+    - PostgreSQL
+    - MySQL
+    - MongoDB
+metadata:
+  last_answered: '2025-12-18T10:36:46.322862'
+  answered_count: 6
+  total_questions: 6

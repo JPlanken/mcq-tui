@@ -63,6 +63,105 @@ class TestQuestion(unittest.TestCase):
         q.other_answer = "Rust"
         self.assertTrue(q.is_answered())
         self.assertEqual(q.other_answer, "Rust")
+    
+    def test_question_id_storage(self):
+        """Test that question ID is stored correctly"""
+        q = Question("Test?", ["A", "B"], "single", question_id="123")
+        self.assertEqual(q.question_id, "123")
+        
+        q_no_id = Question("Test?", ["A", "B"], "single")
+        self.assertIsNone(q_no_id.question_id)
+
+
+class TestAnswerStorage(unittest.TestCase):
+    """Test answer serialization via get_answer_dict()"""
+    
+    def test_get_answer_dict_single_select(self):
+        """Test get_answer_dict() for single-select questions"""
+        q = Question("What is 2+2?", ["3", "4", "5"], "single", question_id="1")
+        q.user_answer = 2
+        
+        answer_dict = q.get_answer_dict()
+        self.assertEqual(answer_dict["id"], "1")
+        self.assertEqual(answer_dict["question"], "What is 2+2?")
+        self.assertEqual(answer_dict["type"], "single")
+        self.assertIsNotNone(answer_dict["answer"])
+        self.assertEqual(answer_dict["answer"]["index"], 2)
+        self.assertEqual(answer_dict["answer"]["option"], "4")
+    
+    def test_get_answer_dict_single_with_other(self):
+        """Test get_answer_dict() for single-select with Other option"""
+        q = Question("Favorite language?", ["Python", "Java"], "single", question_id="2")
+        q.user_answer = 0
+        q.other_answer = "Rust"
+        
+        answer_dict = q.get_answer_dict()
+        self.assertEqual(answer_dict["id"], "2")
+        self.assertEqual(answer_dict["answer"]["type"], "Other")
+        self.assertEqual(answer_dict["answer"]["value"], "Rust")
+    
+    def test_get_answer_dict_multi_select(self):
+        """Test get_answer_dict() for multi-select questions"""
+        q = Question("Select languages", ["Python", "Java", "Rust"], "multi", question_id="3")
+        q.user_answers = [1, 3]
+        
+        answer_dict = q.get_answer_dict()
+        self.assertEqual(answer_dict["id"], "3")
+        self.assertEqual(answer_dict["type"], "multi")
+        self.assertIsNotNone(answer_dict["answer"])
+        self.assertEqual(answer_dict["answer"]["selected_indices"], [1, 3])
+        self.assertEqual(answer_dict["answer"]["selected_options"], ["Python", "Rust"])
+    
+    def test_get_answer_dict_yesno_yes(self):
+        """Test get_answer_dict() for yes/no question with Yes answer"""
+        q = Question("Do you like Python?", ["Yes", "No"], "yesno", question_id="4")
+        q.user_answer = 1
+        
+        answer_dict = q.get_answer_dict()
+        self.assertEqual(answer_dict["id"], "4")
+        self.assertEqual(answer_dict["type"], "yesno")
+        self.assertEqual(answer_dict["answer"], "Yes")
+    
+    def test_get_answer_dict_yesno_no(self):
+        """Test get_answer_dict() for yes/no question with No answer"""
+        q = Question("Do you like Python?", ["Yes", "No"], "yesno", question_id="5")
+        q.user_answer = 2
+        
+        answer_dict = q.get_answer_dict()
+        self.assertEqual(answer_dict["answer"], "No")
+    
+    def test_get_answer_dict_yesno_other(self):
+        """Test get_answer_dict() for yes/no question with Other answer"""
+        q = Question("Do you like Python?", ["Yes", "No"], "yesno", question_id="6")
+        q.user_answer = 3
+        q.other_answer = "Maybe"
+        
+        answer_dict = q.get_answer_dict()
+        self.assertEqual(answer_dict["answer"]["type"], "Other")
+        self.assertEqual(answer_dict["answer"]["value"], "Maybe")
+    
+    def test_get_answer_dict_unanswered(self):
+        """Test get_answer_dict() for unanswered questions"""
+        q = Question("Test?", ["A", "B"], "single", question_id="7")
+        
+        answer_dict = q.get_answer_dict()
+        self.assertEqual(answer_dict["id"], "7")
+        self.assertIsNone(answer_dict["answer"])
+    
+    def test_get_answer_dict_json_serializable(self):
+        """Test that get_answer_dict() returns JSON-serializable data"""
+        import json
+        
+        q = Question("Test?", ["A", "B", "C"], "multi", question_id="8")
+        q.user_answers = [1, 2]
+        
+        answer_dict = q.get_answer_dict()
+        # Should not raise an exception
+        json_str = json.dumps(answer_dict)
+        # Should be able to parse it back
+        parsed = json.loads(json_str)
+        self.assertEqual(parsed["id"], "8")
+        self.assertEqual(len(parsed["answer"]["selected_indices"]), 2)
 
 
 class TestYAMLParsing(unittest.TestCase):
@@ -234,6 +333,56 @@ questions:
             questions = parse_yaml_questions(Path(temp_path))
             # Single-select without options should be skipped
             self.assertEqual(len(questions), 0)
+        finally:
+            os.unlink(temp_path)
+    
+    def test_parse_question_with_id(self):
+        """Test parsing question with ID field"""
+        yaml_content = """
+questions:
+  - id: "q1"
+    question: "Test question?"
+    type: single
+    options:
+      - "Option 1"
+      - "Option 2"
+  - id: 42
+    question: "Another question?"
+    type: multi
+    options:
+      - "A"
+      - "B"
+"""
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as f:
+            f.write(yaml_content)
+            temp_path = f.name
+        
+        try:
+            questions = parse_yaml_questions(Path(temp_path))
+            self.assertEqual(len(questions), 2)
+            self.assertEqual(questions[0].question_id, "q1")
+            self.assertEqual(questions[1].question_id, "42")  # Numeric IDs converted to string
+        finally:
+            os.unlink(temp_path)
+    
+    def test_parse_question_without_id(self):
+        """Test parsing question without ID field (should be None)"""
+        yaml_content = """
+questions:
+  - question: "Test question?"
+    type: single
+    options:
+      - "Option 1"
+      - "Option 2"
+"""
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as f:
+            f.write(yaml_content)
+            temp_path = f.name
+        
+        try:
+            questions = parse_yaml_questions(Path(temp_path))
+            self.assertEqual(len(questions), 1)
+            self.assertIsNone(questions[0].question_id)
         finally:
             os.unlink(temp_path)
 

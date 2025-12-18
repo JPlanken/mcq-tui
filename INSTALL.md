@@ -1,40 +1,15 @@
 # Installation Guide
 
-## Install as Command-Line Tool
+For basic installation instructions, see [README.md](README.md). This guide provides detailed troubleshooting and alternative installation methods.
 
-### Quick Install
+## Quick Install
 
 ```bash
 cd mcq-tui
 uv pip install -e .
 ```
 
-That's it! The `mcq` command should now be available.
-
-**If `mcq` command not found:**
-
-Most systems already have `~/.local/bin` in PATH. If yours doesn't, add this to `~/.zshrc` (or `~/.bashrc`):
-
-```bash
-export PATH="$HOME/.local/bin:$PATH"
-source ~/.zshrc
-```
-
-**Usage:**
-```bash
-mcq questions.yaml
-mcq --help
-```
-
-## Development Installation
-
-For development with isolated environment:
-
-```bash
-cd mcq-tui
-uv sync
-uv run mcq questions.yaml
-```
+The `mcq` command should now be available.
 
 ## Verify Installation
 
@@ -75,9 +50,17 @@ echo $PATH | tr ':' '\n' | grep local
 ```
 
 If `~/.local/bin` is not in the output, add it:
+
+**For zsh:**
 ```bash
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
+```
+
+**For bash:**
+```bash
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
 ```
 
 **Step 5: Test the installation**
@@ -104,11 +87,32 @@ If you see `ModuleNotFoundError: No module named 'mcq_tui'`:
 
 1. Verify `mcq_tui.py` exists in the project root
 2. Test import: `python3 -c "import mcq_tui; print('OK')"`
-3. Check `pyproject.toml` has: `[tool.setuptools] py-modules = ["mcq_tui"]`
+3. Check `pyproject.toml` has:
+   ```toml
+   [tool.setuptools]
+   packages = ["src"]
+   py-modules = ["mcq_tui"]
+   ```
 
 ### Entry Point Errors
 
 If you see `AttributeError: module 'mcq_tui' has no attribute 'main'`:
 
 1. Verify `main()` function exists in `mcq_tui.py`
-2. Check entry point matches: `[project.scripts] mcq = "mcq_tui:main"`
+2. Check entry point matches:
+   ```toml
+   [project.scripts]
+   mcq = "mcq_tui:main"
+   ```
+
+### Development Setup
+
+For development with an isolated environment:
+
+```bash
+cd mcq-tui
+uv sync
+uv run mcq questions.yaml
+```
+
+This creates a virtual environment and installs all dependencies. Use `uv run` to execute commands within the virtual environment.

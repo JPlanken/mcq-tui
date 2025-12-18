@@ -15,6 +15,7 @@ from src import (
     show_summary,
     show_result,
     get_user_answer,
+    export_results_to_yaml,
 )
 from src.console import console
 from src.constants import NavCommand
@@ -97,11 +98,21 @@ questions:
             
             if nav_command == NavCommand.QUIT:
                 if Confirm.ask("\n[yellow]Quit quiz?[/yellow]", default=True):
+                    # Save results before quitting
+                    answered_count = sum(1 for q in questions if q.is_answered())
+                    if answered_count > 0:
+                        if export_results_to_yaml(questions, file_path):
+                            console.print(f"\n[green]✓ Answers saved to {file_path}[/green]")
                     break
                 continue
             elif nav_command == NavCommand.SUMMARY:
                 show_summary(questions)
                 if not Confirm.ask("\n[dim]Return to questions?[/dim]", default=True):
+                    # Save results before exiting
+                    answered_count = sum(1 for q in questions if q.is_answered())
+                    if answered_count > 0:
+                        if export_results_to_yaml(questions, file_path):
+                            console.print(f"\n[green]✓ Answers saved to {file_path}[/green]")
                     break
                 continue
             elif nav_command == NavCommand.JUMP:
@@ -126,6 +137,9 @@ questions:
                     current_idx += 1
                 else:
                     show_summary(questions)
+                    # Save results to YAML file
+                    if export_results_to_yaml(questions, file_path):
+                        console.print(f"\n[green]✓ Answers saved to {file_path}[/green]")
                     break
                 continue
             
@@ -137,15 +151,27 @@ questions:
                     current_idx += 1
                 else:
                     show_summary(questions)
+                    # Save results to YAML file
+                    if export_results_to_yaml(questions, file_path):
+                        console.print(f"\n[green]✓ Answers saved to {file_path}[/green]")
                     break
             elif nav_command is None:
                 if current_idx < total - 1:
                     current_idx += 1
                 else:
                     show_summary(questions)
+                    # Save results to YAML file
+                    if export_results_to_yaml(questions, file_path):
+                        console.print(f"\n[green]✓ Answers saved to {file_path}[/green]")
                     break
     except KeyboardInterrupt:
         console.print("\n\n[yellow]Quiz interrupted by user (Ctrl+C). Exiting...[/yellow]")
+        # Try to save partial results
+        answered_count = sum(1 for q in questions if q.is_answered())
+        if answered_count > 0:
+            if Confirm.ask(f"\n[yellow]Save {answered_count} answer(s) before exiting?[/yellow]", default=True):
+                if export_results_to_yaml(questions, file_path):
+                    console.print(f"\n[green]✓ Answers saved to {file_path}[/green]")
         console.print()
         sys.exit(0)
     
