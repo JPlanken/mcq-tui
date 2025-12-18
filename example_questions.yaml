@@ -1,0 +1,45 @@
+title: "Sample Multiple Choice Questions"
+description: "A quiz covering various topics"
+author: "MCQ TUI"
+
+questions:
+  - id: 1
+    question: "What is the capital of France?"
+    options:
+      - "London"
+      - "Paris"
+      - "Berlin"
+      - "Madrid"
+  
+  - id: 2
+    question: "Which programming language is known for its use in data science and machine learning?"
+    options:
+      - "Java"
+      - "C++"
+      - "Python"
+      - "JavaScript"
+  
+  - id: 3
+    question: "What does HTML stand for?"
+    options:
+      - "Hypertext Markup Language"
+      - "High-level Text Markup Language"
+      - "Hyperlink and Text Markup Language"
+      - "Home Tool Markup Language"
+  
+  - id: 4
+    question: "Which of the following is a NoSQL database?"
+    options:
+      - "MySQL"
+      - "MongoDB"
+      - "PostgreSQL"
+      - "SQLite"
+  
+  - id: 5
+    question: "What is the time complexity of binary search?"
+    options:
+      - "O(n)"
+      - "O(n log n)"
+      - "O(log n)"
+      - "O(1)"
+
