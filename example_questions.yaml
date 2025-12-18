@@ -1,45 +1,60 @@
 title: "Sample Multiple Choice Questions"
-description: "A quiz covering various topics"
+description: "A quiz covering various topics with different question types"
 author: "MCQ TUI"
 
 questions:
+  # Single-select question (default type)
   - id: 1
     question: "What is the capital of France?"
+    type: single
     options:
       - "London"
       - "Paris"
       - "Berlin"
       - "Madrid"
   
+  # Multi-select question
   - id: 2
-    question: "Which programming language is known for its use in data science and machine learning?"
+    question: "Which of the following are programming languages? (Select all that apply)"
+    type: multi
     options:
+      - "Python"
+      - "HTML"
+      - "JavaScript"
+      - "CSS"
       - "Java"
-      - "C++"
+      - "JSON"
+  
+  # Yes/No question
+  - id: 3
+    question: "Do you prefer working with Python over JavaScript?"
+    type: yesno
+  
+  # Yes/No question with custom options (optional)
+  - id: 4
+    question: "Is this application useful?"
+    type: yesno
+    options:
+      - "Definitely"
+      - "Not really"
+  
+  # Single-select with Other option
+  - id: 5
+    question: "What is your favorite programming language?"
+    type: single
+    options:
       - "Python"
       - "JavaScript"
+      - "Rust"
+      - "Go"
   
-  - id: 3
-    question: "What does HTML stand for?"
+  # Multi-select with multiple answers
+  - id: 6
+    question: "Which databases have you used? (Select all that apply)"
+    type: multi
     options:
-      - "Hypertext Markup Language"
-      - "High-level Text Markup Language"
-      - "Hyperlink and Text Markup Language"
-      - "Home Tool Markup Language"
-  
-  - id: 4
-    question: "Which of the following is a NoSQL database?"
-    options:
+      - "PostgreSQL"
       - "MySQL"
       - "MongoDB"
-      - "PostgreSQL"
+      - "Redis"
       - "SQLite"
-  
-  - id: 5
-    question: "What is the time complexity of binary search?"
-    options:
-      - "O(n)"
-      - "O(n log n)"
-      - "O(log n)"
-      - "O(1)"
-
