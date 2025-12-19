@@ -1,0 +1,157 @@
+title: Smoke Test Questions
+description: Edge cases for visual/formatting testing
+author: MCQ TUI Smoke Test
+questions:
+- id: long-question
+  question: This is an extremely long question that is designed to test how the TUI
+    handles text wrapping within the question panel. It should wrap gracefully without
+    breaking the panel borders or causing horizontal scrolling. The question continues
+    with even more text to really stress-test the layout engine and ensure proper
+    rendering in various terminal widths.
+  type: single
+  options:
+  - Short option
+  - This option has a very long text that should test option wrapping behavior in
+    the table display component and ensure proper alignment
+  - Medium length option text
+  - Tiny
+  answer:
+    index: 1
+    option: Short option
+- id: many-options
+  question: Select all numbers you like (multi-select with 10 options)
+  type: multi
+  options:
+  - One
+  - Two
+  - Three
+  - Four
+  - Five
+  - Six
+  - Seven
+  - Eight
+  - Nine
+  - Ten
+  answer:
+    selected_indices:
+    - 2
+    selected_options:
+    - Two
+- id: special-chars
+  question: 'Do special chars display correctly: !@#$%^&*()_+-=[]{}|;'':",./<>?'
+  type: yesno
+  answer: 'Yes'
+- id: unicode-emoji
+  question: 'Do you like 🎉 emojis and ñ unicode chars? Arrow test: → ← ↑ ↓ • ★ ♠ ♣
+    ♥ ♦'
+  type: yesno
+  answer: 'No'
+- id: minimal-question
+  question: Continue?
+  type: yesno
+  answer: 'Yes'
+- id: single-option
+  question: 'There is only one choice available (test single option edge case):'
+  type: single
+  options:
+  - The only option available
+  answer:
+    index: 1
+    option: The only option available
+- id: short-options
+  question: 'Select your preference:'
+  type: single
+  options:
+  - A
+  - B
+  - C
+  - D
+  answer:
+    index: 4
+    option: D
+- id: feedback-correct
+  question: What is 2+2? (Choose 4 to see correct feedback)
+  type: single
+  options:
+  - '3'
+  - '4'
+  - '5'
+  - '22'
+  correct_answer: 2
+  answer:
+    index: 4
+    option: '22'
+- id: feedback-incorrect
+  question: What is the capital of France? (Choose wrong to see incorrect feedback)
+  type: single
+  options:
+  - London
+  - Berlin
+  - Paris
+  - Madrid
+  correct_answer: 3
+  answer:
+    index: 2
+    option: Berlin
+- id: yesno-with-other
+  question: Is this test comprehensive? (Try pressing 3 or 'o' for Other)
+  type: yesno
+  answer: 'Yes'
+- id: multi-long-options
+  question: 'Select all programming paradigms you are familiar with:'
+  type: multi
+  options:
+  - Object-Oriented Programming (OOP) with encapsulation, inheritance, and polymorphism
+  - Functional Programming with immutable data structures and pure functions
+  - Procedural Programming with step-by-step instructions and procedures
+  - Declarative Programming where you describe what you want rather than how to get
+    it
+  - Reactive Programming with asynchronous data streams and propagation of change
+  answer:
+    selected_indices:
+    - 2
+    selected_options:
+    - Functional Programming with immutable data structures and pure functions
+- id: multiline-question
+  question: 'This question spans multiple lines.
+
+
+    Line 2: Does the TUI handle embedded newlines?
+
+    Line 3: All lines should be visible in the panel.
+
+    '
+  type: yesno
+  answer: 'No'
+- id: code-content
+  question: 'What does `console.log(''hello'')` output? Note: backticks and quotes
+    in question'
+  type: single
+  options:
+  - hello
+  - console.log('hello')
+  - undefined
+  - Error
+  answer:
+    index: 1
+    option: hello
+- id: numbers-test
+  question: 'Calculate: 1234567890 × 0 = ?'
+  type: single
+  options:
+  - '1234567890'
+  - '0'
+  - Infinity
+  - '-1'
+  correct_answer: 2
+  answer:
+    index: 4
+    option: '-1'
+- id: last-question
+  question: This is the final question. Press → to see summary, ← to go back.
+  type: yesno
+  answer: 'Yes'
+metadata:
+  last_answered: '2025-12-19T12:23:28.599517'
+  answered_count: 8
+  total_questions: 15

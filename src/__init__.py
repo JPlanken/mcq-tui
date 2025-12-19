@@ -19,6 +19,7 @@ from .answer_formatting import (
     get_answer_summary_text,
 )
 from .export import export_results_to_yaml
+from .input_handlers import set_explanation_provider
 
 __all__ = [
     'Question',
@@ -28,6 +29,7 @@ __all__ = [
     'show_summary',
     'get_user_answer',
     'export_results_to_yaml',
+    'set_explanation_provider',
     'QuestionType',
     'NavCommand',
     'console',

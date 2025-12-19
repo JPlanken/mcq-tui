@@ -247,8 +247,8 @@ See `tests/TESTING.md` for detailed testing documentation.
 
 ## Documentation
 
-- **[INSTALL.md](INSTALL.md)**: Detailed installation guide and troubleshooting
-- **[CONTEXT.md](CONTEXT.md)**: Technical implementation details and architecture
+- **[INSTALL.md](INSTALL.md)**: Installation guide and troubleshooting
+- **[AGENTS.md](AGENTS.md)**: Technical context for agents and developers
 - **[tests/TESTING.md](tests/TESTING.md)**: Testing documentation
 
 ## License

@@ -33,6 +33,7 @@ def parse_yaml_questions(file_path: Path) -> List[Question]:
                 question_type = q_data.get('type', QuestionType.SINGLE).lower()
                 options = q_data.get('options', [])
                 question_id = q_data.get('id')
+                correct_answer = q_data.get('correct_answer')  # 1-based index
                 
                 # Convert id to string if it exists (handles both string and numeric ids)
                 if question_id is not None:
@@ -43,7 +44,7 @@ def parse_yaml_questions(file_path: Path) -> List[Question]:
                 
                 if question_text:
                     if question_type == QuestionType.YESNO or options:
-                        questions.append(Question(question_text, options, question_type, question_id))
+                        questions.append(Question(question_text, options, question_type, question_id, correct_answer))
         
         return questions
     except yaml.YAMLError as e:

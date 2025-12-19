@@ -1,0 +1,10 @@
+---
+description: MCQ TUI project-specific rules
+alwaysApply: true
+---
+
+# MCQ TUI
+
+## Package Management
+
+Use `uv` for Python version management, dependency management, and task execution.

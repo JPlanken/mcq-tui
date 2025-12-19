@@ -10,15 +10,33 @@ from .constants import QuestionType
 class Question:
     """Represents a question with different types"""
     
-    def __init__(self, question_text: str, options: List[str], question_type: str = QuestionType.SINGLE, question_id: Optional[str] = None):
+    def __init__(self, question_text: str, options: List[str], question_type: str = QuestionType.SINGLE, question_id: Optional[str] = None, correct_answer: Optional[int] = None):
         self.question_text = question_text.strip()
         self.options = [opt.strip() for opt in options]
         self.question_type = question_type.lower()
         self.question_id = question_id
+        self.correct_answer = correct_answer  # 1-based index of correct answer
         
         self.user_answer: Optional[int] = None
         self.user_answers: List[int] = []
         self.other_answer: Optional[str] = None
+    
+    def is_correct(self) -> Optional[bool]:
+        """Check if the user's answer is correct. Returns None if not answered or no correct answer defined."""
+        if self.correct_answer is None:
+            return None
+        if not self.is_answered():
+            return None
+        
+        if self.question_type == QuestionType.SINGLE:
+            return self.user_answer == self.correct_answer
+        elif self.question_type == QuestionType.MULTI:
+            # For multi-select, check if all selected answers are correct (simplified)
+            return set(self.user_answers) == {self.correct_answer}
+        elif self.question_type == QuestionType.YESNO:
+            return self.user_answer == self.correct_answer
+        
+        return None
     
     def is_answered(self) -> bool:
         """Check if question has been answered"""
