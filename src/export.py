@@ -26,10 +26,13 @@ def _format_answer_for_yaml(question: Question) -> Any:
     """
     if question.question_type == QuestionType.MULTI:
         if question.user_answers:
-            return {
-                "selected_indices": sorted(question.user_answers),
-                "selected_options": [question.options[i - 1] for i in sorted(question.user_answers)]
-            }
+            # Filter to valid indices only to prevent IndexError
+            valid_indices = [i for i in sorted(question.user_answers) if 1 <= i <= len(question.options)]
+            if valid_indices:
+                return {
+                    "selected_indices": valid_indices,
+                    "selected_options": [question.options[i - 1] for i in valid_indices]
+                }
         return None
     elif question.question_type == QuestionType.YESNO:
         if question.user_answer == 1:
@@ -42,7 +45,7 @@ def _format_answer_for_yaml(question: Question) -> Any:
     else:  # single select
         if question.user_answer == 0 and question.other_answer:
             return {"type": "Other", "value": question.other_answer}
-        elif question.user_answer is not None:
+        elif question.user_answer is not None and 1 <= question.user_answer <= len(question.options):
             return {
                 "index": question.user_answer,
                 "option": question.options[question.user_answer - 1]

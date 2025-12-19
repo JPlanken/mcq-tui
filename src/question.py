@@ -11,11 +11,23 @@ class Question:
     """Represents a question with different types"""
     
     def __init__(self, question_text: str, options: List[str], question_type: str = QuestionType.SINGLE, question_id: Optional[str] = None, correct_answer: Optional[int] = None):
+        # Validate and sanitize inputs
+        if not question_text or not question_text.strip():
+            raise ValueError("Question text cannot be empty")
+        
         self.question_text = question_text.strip()
-        self.options = [opt.strip() for opt in options]
-        self.question_type = question_type.lower()
+        self.options = [opt.strip() for opt in options] if options else []
+        self.question_type = question_type.lower() if question_type else QuestionType.SINGLE
         self.question_id = question_id
-        self.correct_answer = correct_answer  # 1-based index of correct answer
+        
+        # Validate correct_answer is within bounds if provided
+        if correct_answer is not None:
+            if not isinstance(correct_answer, int) or correct_answer < 1 or correct_answer > len(self.options):
+                self.correct_answer = None  # Silently ignore invalid correct_answer
+            else:
+                self.correct_answer = correct_answer
+        else:
+            self.correct_answer = None
         
         self.user_answer: Optional[int] = None
         self.user_answers: List[int] = []
@@ -62,10 +74,15 @@ class Question:
         
         if self.question_type == QuestionType.MULTI:
             if self.user_answers:
-                result["answer"] = {
-                    "selected_indices": sorted(self.user_answers),
-                    "selected_options": [self.options[i - 1] for i in sorted(self.user_answers)],
-                }
+                # Filter to valid indices only to prevent IndexError
+                valid_indices = [i for i in sorted(self.user_answers) if 1 <= i <= len(self.options)]
+                if valid_indices:
+                    result["answer"] = {
+                        "selected_indices": valid_indices,
+                        "selected_options": [self.options[i - 1] for i in valid_indices],
+                    }
+                else:
+                    result["answer"] = None
             else:
                 result["answer"] = None
         elif self.question_type == QuestionType.YESNO:
@@ -86,7 +103,7 @@ class Question:
                     "type": "Other",
                     "value": self.other_answer
                 }
-            elif self.user_answer is not None:
+            elif self.user_answer is not None and 1 <= self.user_answer <= len(self.options):
                 result["answer"] = {
                     "index": self.user_answer,
                     "option": self.options[self.user_answer - 1]

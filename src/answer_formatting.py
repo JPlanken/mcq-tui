@@ -88,8 +88,11 @@ def get_answer_summary_text(question: Question) -> str:
     """
     if question.question_type == QuestionType.MULTI:
         if question.user_answers:
-            selected = [f"{a}: {question.options[a-1]}" for a in sorted(question.user_answers)]
-            return ", ".join(selected)
+            # Filter to valid indices only
+            valid_answers = [a for a in sorted(question.user_answers) if 1 <= a <= len(question.options)]
+            if valid_answers:
+                selected = [f"{a}: {question.options[a-1]}" for a in valid_answers]
+                return ", ".join(selected)
         return "[dim]No answer[/dim]"
     elif question.question_type == QuestionType.YESNO:
         answer_str, other = format_yesno_answer(question)
@@ -103,5 +106,6 @@ def get_answer_summary_text(question: Question) -> str:
     else:  # single
         if question.user_answer == 0:
             return f"Other: {question.other_answer}"
-        else:
+        elif question.user_answer is not None and 1 <= question.user_answer <= len(question.options):
             return f"Option {question.user_answer}: {question.options[question.user_answer - 1]}"
+        return "[dim]No answer[/dim]"

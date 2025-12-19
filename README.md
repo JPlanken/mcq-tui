@@ -1,5 +1,7 @@
 # Multiple Choice Question TUI
 
+> 🎨 **Vibe Engineered Project** - This project was developed with AI assistance.
+
 A Rich-based terminal user interface for answering multiple choice questions from YAML files with interactive visual feedback.
 
 ## Quick Start
